@@ -50,6 +50,7 @@ public:
 
 		std::uint8_t vtNumber = 0;
 		std::string screenCaptureDir;
+		std::string ax141150Port;
 		for (const auto &arg : args)
 		{
 			if (arg.startsWith("--vt-number"))
@@ -66,9 +67,14 @@ public:
 			{
 				screenCaptureDir = arg.fromFirstOccurrenceOf("--screen-capture-dir=", false, false).toStdString();
 			}
+
+			if (arg.startsWith("--ax141150-port="))
+			{
+				ax141150Port = arg.fromFirstOccurrenceOf("--ax141150-port=", false, false).toStdString();
+			}
 		}
 
-		mainWindow.reset(new MainWindow(getApplicationNameWithBuildInfo(), logFile.currentLogFile(), vtNumber, screenCaptureDir));
+		mainWindow.reset(new MainWindow(getApplicationNameWithBuildInfo(), logFile.currentLogFile(), vtNumber, screenCaptureDir, ax141150Port));
 	}
 
 	void shutdown() override
@@ -130,8 +136,9 @@ public:
      * @param name - window name to be displayed in the window title
      * @param vtNumberCmdLineArg - in the range of 1 - 32
      * @param screenCaptureDir - path to the directory where the screen capture results will be saved
+     * @param ax141150Port - serial port or Bluetooth address of an Axiomatic AX141150, overrides the configured CAN driver
      */
-		MainWindow(juce::String name, const std::string &canLogPath, int vtNumberCmdLineArg = 0, std::string screenCaptureDir = "");
+		MainWindow(juce::String name, const std::string &canLogPath, int vtNumberCmdLineArg = 0, std::string screenCaptureDir = "", const std::string &ax141150Port = "");
 
 		/* Note: Be careful if you override any DocumentWindow methods - the base
            class uses a lot of them, so by overriding you might break its functionality.

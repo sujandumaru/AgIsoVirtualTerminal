@@ -12,7 +12,8 @@
 AgISOVirtualTerminalApplication::MainWindow::MainWindow(juce::String name,
                                                         const std::string &canLogPath,
                                                         int vtNumberCmdLineArg,
-                                                        std::string screenCaptureDir) :
+                                                        std::string screenCaptureDir,
+                                                        const std::string &ax141150Port) :
   DocumentWindow(name,
                  juce::Desktop::getInstance().getDefaultLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId),
                  DocumentWindow::allButtons)
@@ -41,8 +42,16 @@ AgISOVirtualTerminalApplication::MainWindow::MainWindow(juce::String name,
 	config.set_number_of_packets_per_dpo_message(255);
 	config.set_number_of_packets_per_cts_message(255);
 
+	// Assigned to the channel and not put in canDrivers, because the settings code casts canDrivers entries to fixed driver types
+	if (!ax141150Port.empty())
+	{
+		isobus::CANHardwareInterface::assign_can_channel_frame_handler(0, std::make_shared<isobus::AX141150Plugin>(ax141150Port));
+	}
 #ifndef JUCE_WINDOWS
-	isobus::CANHardwareInterface::assign_can_channel_frame_handler(0, canDrivers.at(0));
+	else
+	{
+		isobus::CANHardwareInterface::assign_can_channel_frame_handler(0, canDrivers.at(0));
+	}
 #endif
 	isobus::NAME serverNAME(0);
 
