@@ -38,6 +38,7 @@ elseif(APPLE)
 else()
   set(CAN_DRIVER "SocketCAN")
 endif()
+list(APPEND CAN_DRIVER "AX141150")
 
 find_package(JUCE MODULE)
 find_package(CAN_Stack MODULE)
