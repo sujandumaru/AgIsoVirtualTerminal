@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - sujan/ax141150-test-build
   pull_request:
     types: [opened, synchronize, reopened]
   workflow_call:
@@ -52,8 +53,13 @@ jobs:
       - name: Compile
         run: |
           mkdir build
-          cmake -S . -B build -DBUILD_EXAMPLES=OFF -DBUILD_TESTING=OFF -Wno-dev
+          cmake -S . -B build -DBUILD_EXAMPLES=OFF -DBUILD_TESTING=OFF -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64" -Wno-dev
           cmake --build build --config Release --target package
+      - name: Check Binary
+        run: |
+          bin=$(find build/AgISOVirtualTerminal_artefacts -path '*.app/Contents/MacOS/AgISOVirtualTerminal' -type f)
+          lipo "$bin" -verify_arch arm64 x86_64
+          vtool -show-build "$bin"
       - name: 'Upload OSX Installer'
         uses: actions/upload-artifact@v7
         with:
